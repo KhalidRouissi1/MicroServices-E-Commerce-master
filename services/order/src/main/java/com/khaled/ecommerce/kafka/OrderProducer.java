@@ -1,7 +1,5 @@
-package com.khaled.ecommerce.kakfa;
+package com.khaled.ecommerce.kafka;
 
-import com.khaled.ecommerce.order.Order;
-import com.khaled.ecommerce.order.OrderController;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -14,12 +12,12 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Slf4j
 public class OrderProducer {
-    private final KafkaTemplate<String, OrderConfirmaiotn>  kafkaTemplate;
+    private final KafkaTemplate<String, OrderConfirmation>  kafkaTemplate;
 
-    public void sendOrederConfirmation(OrderConfirmaiotn orderConfirmaiotn){
+    public void sendOrederConfirmation(OrderConfirmation orderConfirmaiotn){
 
         log.info("Sending order confirmation");
-        Message<OrderConfirmaiotn> message = MessageBuilder
+        Message<OrderConfirmation> message = MessageBuilder
                 .withPayload(orderConfirmaiotn)
                 .setHeader(KafkaHeaders.TOPIC,"order-topic")
                 .build();

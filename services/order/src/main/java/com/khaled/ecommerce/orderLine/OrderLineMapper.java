@@ -1,7 +1,9 @@
 package com.khaled.ecommerce.orderLine;
 
 import com.khaled.ecommerce.order.Order;
+import org.springframework.stereotype.Service;
 
+@Service
 public class OrderLineMapper {
     public OrderLine toOrderLine(OrderLineRequest request) {
         return OrderLine.builder()

@@ -1,21 +1,22 @@
 package com.khaled.ecommerce.product;
 
+import java.util.List;
 import java.util.stream.Collectors;
-import java.util.*;
+import java.util.Comparator;
+import java.util.ArrayList;
 
 import com.khaled.ecommerce.execption.ProductPurchaseExecption;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import java.util.List;
-
 
 @Service
 @RequiredArgsConstructor
 public class ProductService {
     private final ProductRepository repository;
     private final ProductMapper mapper;
+
     public Integer createProduct(@Valid ProductRequest request) {
         var product = mapper.toProduct(request);
         return repository.save(product).getId();
@@ -40,20 +41,21 @@ public class ProductService {
         for (int i = 0; i < storedProducts.size(); i++) {
             var product = storedProducts.get(i);
             var productRequest = sortedRequest.get(i);
-            if (product.getAvailable_quantity() < productRequest.quantity()) {
-                throw new ProductPurchaseExecption("Insufficient stock quantity for product with ID:: " + productRequest.productId());
+            if (product.getAvailableQuantity() < productRequest.quantity()) {
+                throw new ProductPurchaseExecption("Insufficient stock quantity for product with ID: " + productRequest.productId());
             }
-            var newAvailableQuantity = product.getAvailable_quantity() - productRequest.quantity();
-            product.setAvailable_quantity(newAvailableQuantity);
+            var newAvailableQuantity = product.getAvailableQuantity() - productRequest.quantity();
+            product.setAvailableQuantity(newAvailableQuantity);
             repository.save(product);
-            purchasedProducts.add(mapper.toproductPurchaseResponse(product, productRequest.quantity()));
+            purchasedProducts.add(mapper.toProductPurchaseResponse(product, productRequest.quantity()));
         }
         return purchasedProducts;
     }
-    public ProductResponse findById(Integer productid) {
-        return repository.findById(productid)
+
+    public ProductResponse findById(Integer productId) {
+        return repository.findById(productId)
                 .map(mapper::toProductResponse)
-                .orElseThrow(()-> new EntityNotFoundException("Not found with the id "+ productid));
+                .orElseThrow(() -> new EntityNotFoundException("Not found with the id " + productId));
     }
 
     public List<ProductResponse> findAll() {

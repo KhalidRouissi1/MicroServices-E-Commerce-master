@@ -13,7 +13,7 @@ import java.util.List;
 public class ProductController {
     private final ProductService  service;
     @PostMapping
-    public ResponseEntity createProduct(
+    public ResponseEntity<Integer> createProduct(
             @RequestBody @Valid ProductRequest request
 
     ) {

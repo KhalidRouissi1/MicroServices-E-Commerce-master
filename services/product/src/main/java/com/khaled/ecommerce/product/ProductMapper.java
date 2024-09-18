@@ -1,21 +1,19 @@
 package com.khaled.ecommerce.product;
 
 import com.khaled.ecommerce.product.category.Category;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
-@Service
+@Component
 public class ProductMapper {
-    public Product toProduct( ProductRequest request) {
+    public Product toProduct(ProductRequest request) {
         return Product.builder()
                 .id(request.id())
                 .name(request.name())
                 .description(request.description())
                 .price(request.price())
-                .available_quantity(request.availabelQuantity())
-                .category(Category.builder().
-                        id(request.id())
+                .availableQuantity(request.availabelQuantity()) // Corrected the typo
+                .category(Category.builder()
+                        .id(request.categoryId()) // Assuming you have a categoryId in ProductRequest
                         .build()
                 )
                 .build();
@@ -26,7 +24,7 @@ public class ProductMapper {
                 product.getId(),
                 product.getName(),
                 product.getDescription(),
-                product.getAvailable_quantity(),
+                product.getAvailableQuantity(), // Fixed field name
                 product.getPrice(),
                 product.getCategory().getId(),
                 product.getCategory().getName(),
@@ -34,8 +32,7 @@ public class ProductMapper {
         );
     }
 
-
-    public ProductPurchaseResponse toproductPurchaseResponse(Product product, double quantity) {
+    public ProductPurchaseResponse toProductPurchaseResponse(Product product, double quantity) {
         return new ProductPurchaseResponse(
                 product.getId(),
                 product.getName(),

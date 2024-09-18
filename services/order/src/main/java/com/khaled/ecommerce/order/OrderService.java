@@ -2,13 +2,16 @@ package com.khaled.ecommerce.order;
 
 import com.khaled.ecommerce.customer.CustomerClient;
 import com.khaled.ecommerce.exectptions.BusinessExecption;
-import com.khaled.ecommerce.kakfa.OrderConfirmaiotn;
-import com.khaled.ecommerce.kakfa.OrderProducer;
+import com.khaled.ecommerce.kafka.OrderConfirmation;
+import com.khaled.ecommerce.kafka.OrderProducer;
 import com.khaled.ecommerce.orderLine.OrderLineRequest;
 import com.khaled.ecommerce.orderLine.OrderLineService;
+import com.khaled.ecommerce.payment.PaymentClient;
+import com.khaled.ecommerce.payment.PaymentRequest;
 import com.khaled.ecommerce.prodcut.ProdcutClient;
 import com.khaled.ecommerce.prodcut.PurchaseRequest;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -24,15 +27,18 @@ public class OrderService {
     private final OrderMapper mapper;
     private final OrderLineService orderLineService;
     private final OrderProducer orderProducer;
-    public Integer createOrder(OrderRequest request){
-        //check the customer --> OpenFeign
+    private final PaymentClient paymentClient;
+
+    @Transactional
+    public Integer createOrder(OrderRequest request) {
         var customer = this.customerClient.findCustomerById(request.customerId())
-                .orElseThrow(()->new BusinessExecption("Cannot create order, No customer found with the provided id"+request.customerId()));
-        //purchase the products --> product-ms (Rest Tempalte)
-        var purchasedProducts = this.prodcutClient.purchaseProducts(request.prodcuts());
+                .orElseThrow(() -> new BusinessExecption("Cannot create order:: No customer exists with the provided ID"));
+
+        var purchasedProducts = prodcutClient.purchaseProducts(request.products());
+
         var order = this.orderRepository.save(mapper.toOrder(request));
-        //persist order         //persist the order line
-        for (PurchaseRequest purchaseRequest: request.prodcuts()) {
+
+        for (PurchaseRequest purchaseRequest : request.products()) {
             orderLineService.saveOrderLine(
                     new OrderLineRequest(
                             null,
@@ -42,31 +48,40 @@ public class OrderService {
                     )
             );
         }
-        //todo start payment process
+
+        var paymentRequest = new PaymentRequest(
+                request.amount(),
+                request.paymentMethod(),
+                order.getId(),
+                order.getReference(),
+                customer
+        );
+        paymentClient.requestOrderPayment(paymentRequest);
+
         orderProducer.sendOrederConfirmation(
-                new OrderConfirmaiotn(
-                        request.refrence(),
+                new OrderConfirmation(
+                        order.getReference(),
                         request.amount(),
                         request.paymentMethod(),
                         customer,
                         purchasedProducts
                 )
         );
-        //send the order confirmation --> send notification-ms (kafka)
+
         return order.getId();
-    };
+    }
 
     public List<OrderResponse> findAll() {
-            return orderRepository
-                    .findAll()
-                    .stream()
-                    .map(mapper::fromOrder)
-                    .collect(Collectors.toList());
+        return orderRepository
+                .findAll()
+                .stream()
+                .map(mapper::fromOrder)
+                .collect(Collectors.toList());
     }
 
     public OrderResponse findById(Integer orderId) {
         return orderRepository.findById(orderId)
                 .map(mapper::fromOrder)
-                .orElseThrow(()->new EntityNotFoundException("Cannot find order with id "+orderId));
+                .orElseThrow(() -> new EntityNotFoundException("Cannot find order with id " + orderId));
     }
 }

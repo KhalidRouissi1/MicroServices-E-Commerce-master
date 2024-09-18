@@ -2,34 +2,32 @@ package com.khaled.ecommerce.product;
 
 import com.khaled.ecommerce.product.category.Category;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.math.BigDecimal;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
+@Setter
+@Getter
 @Builder
 @Entity
-
 public class Product {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
     private String name;
     private String description;
-    private double available_quantity;
+
+    @Column(name = "available_quantity") // Ensure column name matches DB schema
+    private double availableQuantity;
+
     private BigDecimal price;
+
     @ManyToOne
-    @JoinColumn(
-            name = "category_id"
-    )
+    @JoinColumn(name = "category_id")
     private Category category;
 
-    public int productId() {
-        return this.id;
-    }
+    // Standard getter and setter methods (optional as Lombok generates them)
 }

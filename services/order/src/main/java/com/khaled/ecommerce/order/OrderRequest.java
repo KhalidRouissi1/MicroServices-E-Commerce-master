@@ -22,6 +22,6 @@ public record OrderRequest(
 
         String customerId,
         @NotNull(message = "You should at least purchase a product")
-        List<PurchaseRequest> prodcuts
+        List<PurchaseRequest> products
 ) {
 }
