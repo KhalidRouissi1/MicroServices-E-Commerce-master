@@ -77,9 +77,9 @@ public class EmailService {
 
         Map<String, Object> variables  = new HashMap<>();
         variables.put("customerName", customerName);
-        variables.put("total amount", amount);
+        variables.put("totalAmount", amount);
         variables.put("orderReference", orderReference);
-        variables.put("Products ", products);
+        variables.put("products ", products);
 
         Context context = new Context();
         context.setVariables(variables);

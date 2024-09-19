@@ -41,7 +41,7 @@ public class NotficationConsumer
 
     }
 
-    @KafkaListener(topics ="order-topic")
+    @KafkaListener(topics = "order-topic", groupId = "orderGroup")
     public void consumeOrderSuccessNotification(OrderConfirmation orderConfirmation) throws MessagingException {
         log.info("Consuming the message from order topic :: {}", orderConfirmation);
         repository.save(

@@ -32,5 +32,5 @@ spring:
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
         spring.json.trusted.packages: '*'
-        spring.json.type.mapping: orderConfirmation:com.khaled.ecommerce.kafka.order.OrderConfirmation,paymentConfirmation:com.khaled.ecommerce.notification.PaymentNotificationRequest
+        spring.json.type.mapping: orderConfirmation:com.khaled.ecommerce.kafka.order.OrderConfirmation,paymentConfirmation:com.khaled.ecommerce.kafka.payment.PaymentConfirmation
 

@@ -17,7 +17,7 @@ public class PaymentService {
         public Integer createPayment(@Valid PaymentRequest request) {
 
         var payment = repository.save(mapper.toPaymentMethod(request));
-       /*notificationProducer.sendNotification(
+       notificationProducer.sendNotification(
                 new PaymentNotificationRequest(
                         request.orderReference(),
                         request.amount(),
@@ -26,7 +26,7 @@ public class PaymentService {
                         request.customer().lastName(),
                         request.customer().email()
                         )
-        );*/
+        );
         return payment.getId();
 
     }

@@ -69,7 +69,7 @@ services:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
     ports:
-      - 22181:2181
+      - 2181:2181
     networks:
       - microservices-net
 
@@ -98,6 +98,15 @@ services:
       - 1025:1025
     networks:
       - microservices-net
+  zipkin:
+    container_name: zipkin
+    image: openzipkin/zipkin
+    ports:
+      - 9411:9411
+    networks:
+    - microservices-net
+
+
 
 networks:
   microservices-net:
